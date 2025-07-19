@@ -16,6 +16,9 @@ from config.config_reader import config
 
 # Обработчики
 
+# БД
+from app.database import init_db
+
 
 # Outer-мидварь, чтобы был ответ на колбэки (чтобы пользователь видел, что запрос обрабатывается)
 class CallbackResponseMiddleware(BaseMiddleware):
@@ -38,6 +41,9 @@ async def main():
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     )
     logger.info("Логирование настроено")
+
+    # Инициализация базы данных
+    init_db()
 
     # Инициализация бота
     bot = Bot(token=config.bot_token.get_secret_value(), default=DefaultBotProperties(parse_mode= ParseMode.HTML))

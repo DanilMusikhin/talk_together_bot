@@ -1,6 +1,8 @@
+# Издержки работы программы
 __pycache__/
 venv/
+
+# Свои файлы
 config.env
-alembic/
-alembic.ini
 test.py
+talk_together_bot.db 
