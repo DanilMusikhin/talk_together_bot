@@ -1,5 +1,6 @@
 """ | Файл настройки базы данных | """
 
+# Библиотеки
 from sqlalchemy import create_engine, Column, Integer, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -7,9 +8,13 @@ from sqlalchemy.orm import sessionmaker
 from datetime import datetime
 import logging
 
-DATABASE_URL = "sqlite:///talk_together_bot.db"
+# Конфиг
+from config.config_reader import config
 
-engine = create_engine(DATABASE_URL)
+
+# Настройка базы данных
+logger = logging.getLogger(__name__)
+engine = create_engine(config.DATABASE_URL)
 local_session = sessionmaker(bind=engine)
 base = declarative_base()
 
@@ -75,4 +80,4 @@ class Database:
 
 def init_db():
     base.metadata.create_all(bind=engine)
-    logging.info("База данных и таблицы успешно созданы")
+    logger.info("База данных и таблицы успешно созданы")
