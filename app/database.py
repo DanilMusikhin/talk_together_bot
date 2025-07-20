@@ -1,6 +1,6 @@
 """ | Файл настройки базы данных | """
 
-from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy import create_engine, Column, Integer, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -16,6 +16,7 @@ class Question(base):
     __tablename__ = 'questions'
     
     id = Column(Integer, primary_key=True, index=True)
+    created_at = Column(DateTime, nullable= False)
     category = Column(String, nullable=False)
     text = Column(String, nullable=False)
 
