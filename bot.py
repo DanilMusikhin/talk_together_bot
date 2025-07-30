@@ -28,7 +28,7 @@ class CallbackResponseMiddleware(BaseMiddleware):
         data: Dict[str, Any]
     ) -> Any:
         await event.answer()
-        return await super().__call__(handler, event, data)
+        return await handler(event, data)
 
 
 logger = logging.getLogger(__name__)
