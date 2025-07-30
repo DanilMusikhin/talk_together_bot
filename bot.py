@@ -13,9 +13,8 @@ from typing import Any, Callable, Dict, Awaitable
 
 # Конфиг
 from config.config_reader import config
-
 # Обработчики
-
+from app.handlers import database_handlers
 # БД
 from app.database import init_db
 
@@ -46,7 +45,7 @@ async def main():
     init_db()
 
     # Инициализация бота
-    bot = Bot(token=config.bot_token.get_secret_value(), default=DefaultBotProperties(parse_mode= ParseMode.HTML))
+    bot = Bot(token=config.bot_token.get_secret_value(), default=DefaultBotProperties(parse_mode= ParseMode.MARKDOWN))
     dp = Dispatcher(storage= MemoryStorage())
 
     # Установка команд
@@ -57,9 +56,9 @@ async def main():
 
     # Включение обработчиков и мидварей
     dp.callback_query.middleware(CallbackResponseMiddleware())
-    # dp.include_router(
-    #     # Здесь будут подключены обработчики
-    # )   
+    dp.include_router(
+        database_handlers.router,
+    )
 
     # Начало работы бота
     logger.info("Бот запущен")

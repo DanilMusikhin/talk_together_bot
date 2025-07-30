@@ -14,7 +14,7 @@ from config.config_reader import config
 
 # Настройка базы данных
 logger = logging.getLogger(__name__)
-engine = create_engine(config.DATABASE_URL)
+engine = create_engine(config.database_url.get_secret_value())
 local_session = sessionmaker(bind=engine)
 base = declarative_base()
 
