@@ -20,6 +20,7 @@ from app.keyboards import database_actions_keyboard
 from app.callback_factories import DatabaseCallbackFactory, DatabaseActions
 
 
+
 """
     Перменные для работы
 """
@@ -31,16 +32,18 @@ router = Router()
 """
     Фильтры
 """
-class IsCreatorFilter(BaseFilter):
+class IsAdminFilter(BaseFilter):
     async def __call__(self, message: Message) -> bool:
-        if message.from_user.id == config.id_creator.get_secret_value():
-            message.answer(DatabaseMessages.NO_RULES)
+        if message.from_user.id in config.id_admins:
+            return True
+        await message.answer(DatabaseMessages.NO_RULES)
+        return False
 
 """
     Хэндлеры
 """
 """ Начало работы с базой данных """
-@router.message(Command("questions"))
+@router.message(Command("questions"), IsAdminFilter())
 async def questions_handler(message: Message, state: FSMContext):
     await state.clear()
     kb = database_actions_keyboard()
