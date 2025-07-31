@@ -13,7 +13,7 @@ from app.database import Database
 # Диалоги
 from app.messages import DatabaseMessages
 # Клавиатуры
-from app.keyboards import database_actions_keyboard
+from app.keyboards import database_actions_keyboard, pagination_keyboard
 # Фабрика колбэков
 from app.callback_factories import DatabaseCallbackFactory, DatabaseActions
 # Состояния
@@ -55,6 +55,51 @@ async def create_message_handler(message: Message, state: FSMContext):
     except Exception as e:
         await message.answer(DatabaseMessages.CREATE_ERROR)
         logger.error(f"Ошибка при создании вопроса: {e}")
+
+""" READ """
+@router.callback_query(DatabaseCallbackFactory.filter(F.action == DatabaseActions.READ))
+async def read_handler(callback: CallbackQuery, callback_data: DatabaseCallbackFactory):
+    """Обработчик для чтения данных из базы по страницам.
+
+    Args:
+        callback (CallbackQuery): Объект колбэка.
+        callback_data (DatabaseCallbackFactory): Данные колбэка для определения страницы.
+    """
+    try:
+        # Устанавливаем количество записей на странице
+        records_per_page = 5
+        page = callback_data.read_page
+
+        # Получаем все записи из таблицы
+        all_questions = Database.Question.read_all()
+        total_records = len(all_questions)
+
+        if total_records == 0:
+            return await callback.message.edit_text(DatabaseMessages.READ_EMPTY)
+
+        # Вычисляем записи для текущей страницы
+        start_index = page * records_per_page
+        end_index = start_index + records_per_page
+        page_records = all_questions[start_index:end_index]
+
+        # Формируем текст ответа
+        response = "\n".join(
+            [f"{record.id}. [{record.category}] {record.text}" for record in page_records]
+        )
+
+        # Создаём клавиатуру для переключения страниц
+        keyboard = pagination_keyboard(
+            action=DatabaseActions.READ, 
+            current_page=page, 
+            total_records=total_records, 
+            records_per_page=records_per_page
+        )
+
+        # Отправляем сообщение с данными и кнопками
+        await callback.message.edit_text(response, reply_markup=keyboard.as_markup())
+    except Exception as e:
+        logger.error(f"Ошибка при чтении данных: {e}")
+        await callback.message.edit_text(DatabaseMessages.READ_ERROR)
 
 """ UPDATE """
 @router.callback_query(DatabaseCallbackFactory.filter(F.action == DatabaseActions.UPDATE))
