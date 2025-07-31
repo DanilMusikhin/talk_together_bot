@@ -1,11 +1,13 @@
 """ | Файл настройки базы данных | """
 
-# Библиотеки
+# Для работы с базой данных
 from sqlalchemy import create_engine, Column, Integer, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
+# Для указания времени создания записи
 from datetime import datetime
+# Логирование
 import logging
 
 # Конфиг
@@ -24,7 +26,7 @@ class Database:
         __abstract__ = True
 
         id = Column(Integer, primary_key=True, index=True)
-        created_at = Column(DateTime, nullable=False, default=datetime.now)
+        timestamp = Column(DateTime, nullable=False, default=datetime.utcnow)
 
         def __init__(self, **kwargs):
             for key, value in kwargs.items():
@@ -61,6 +63,7 @@ class Database:
             if obj:
                 for key, value in kwargs.items():
                     setattr(obj, key, value)
+                obj.timestamp = datetime.utcnow() # обновляем время изменения
                 session.commit()
             session.close()
             return obj
