@@ -18,7 +18,8 @@ from app.messages import DatabaseMessages
 from app.keyboards import database_actions_keyboard
 # Фабрика колбэков
 from app.callback_factories import DatabaseCallbackFactory, DatabaseActions
-
+# Состояния
+from app.states import DatabaseStates
 
 
 """
@@ -26,7 +27,6 @@ from app.callback_factories import DatabaseCallbackFactory, DatabaseActions
 """
 logger = logging.getLogger(__name__)
 router = Router()
-
 
 
 """
@@ -54,3 +54,10 @@ async def questions_handler(message: Message, state: FSMContext):
 @router.callback_query(DatabaseCallbackFactory.filter(F.action == DatabaseActions.CREATE))
 async def create_handler(callback: CallbackQuery, state: FSMContext):
     await callback.message.edit_text(DatabaseMessages.CREATE)
+    await state.set_state(DatabaseStates.CREATE)
+
+@router.message(DatabaseStates.CREATE)
+async def create_message_handler(message: Message, state: FSMContext):
+    category, text = message.text.split("_", 1)
+    Database.Question.create(category= category, text= text)
+    await message.answer(DatabaseMessages.CREATE_SUCCESS)

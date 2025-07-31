@@ -20,11 +20,15 @@ base = declarative_base()
 
 
 class Database:
-    class __Base:
+    class __Base(base):
         __abstract__ = True
 
         id = Column(Integer, primary_key=True, index=True)
         created_at = Column(DateTime, nullable=False, default=datetime.now)
+
+        def __init__(self, **kwargs):
+            for key, value in kwargs.items():
+                setattr(self, key, value)
 
         @classmethod
         def create(cls, **kwargs):
