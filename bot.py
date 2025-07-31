@@ -17,18 +17,8 @@ from config.config_reader import config
 from app.handlers import database_handlers
 # БД
 from app.database import init_db
-
-
-# Outer-мидварь, чтобы был ответ на колбэки (чтобы пользователь видел, что запрос обрабатывается)
-class CallbackResponseMiddleware(BaseMiddleware):
-    async def __call__(
-        self, 
-        handler: Callable[[types.CallbackQuery, Dict[str, Any]], Awaitable[Any]],
-        event: TelegramObject, 
-        data: Dict[str, Any]
-    ) -> Any:
-        await event.answer()
-        return await handler(event, data)
+# Мидварь
+from app.middlewares import CallbackResponseMiddleware
 
 
 logger = logging.getLogger(__name__)

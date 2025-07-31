@@ -3,15 +3,13 @@
 # Для работы с тг
 from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery
-from aiogram.filters import BaseFilter, Command
+from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 # Логирование
 import logging
 
 # Для работы с базой данных
 from app.database import Database
-# Конфиг для получения id администратора
-from config.config_reader import config
 # Диалоги
 from app.messages import DatabaseMessages
 # Клавиатуры
@@ -20,6 +18,8 @@ from app.keyboards import database_actions_keyboard
 from app.callback_factories import DatabaseCallbackFactory, DatabaseActions
 # Состояния
 from app.states import DatabaseStates
+# Фильтры
+from app.filters import IsAdminFilter
 
 
 """
@@ -28,16 +28,6 @@ from app.states import DatabaseStates
 logger = logging.getLogger(__name__)
 router = Router()
 
-
-"""
-    Фильтры
-"""
-class IsAdminFilter(BaseFilter):
-    async def __call__(self, message: Message) -> bool:
-        if message.from_user.id in config.id_admins:
-            return True
-        await message.answer(DatabaseMessages.NO_RULES)
-        return False
 
 """
     Хэндлеры
