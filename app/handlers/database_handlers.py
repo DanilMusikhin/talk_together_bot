@@ -52,9 +52,9 @@ async def create_message_handler(message: Message, state: FSMContext):
         category, text = message.text.split("_", 1)
         Database.Question.create(category= category, text= text)
         await message.answer(DatabaseMessages.CREATE_SUCCESS)
-    except Exception as e:
+    except ValueError:
         await message.answer(DatabaseMessages.CREATE_ERROR)
-        logger.error(f"Ошибка при создании вопроса: {e}")
+        logger.error(f"Ошибка при создании вопроса: {message.text}")
 
 """ READ """
 @router.callback_query(DatabaseCallbackFactory.filter(F.action == DatabaseActions.READ))
@@ -119,6 +119,7 @@ async def update_message_handler(message: Message, state: FSMContext):
             await message.answer(DatabaseMessages.UPDATE_NOT_FOUND)
     except ValueError:
         await message.answer(DatabaseMessages.UPDATE_ERROR)
+        logger.error(f"Ошибка при обновлении вопроса: {message.text}")
 
 """ DELETE """
 @router.callback_query(DatabaseCallbackFactory.filter(F.action == DatabaseActions.DELETE))
@@ -137,3 +138,4 @@ async def delete_message_handler(message: Message, state: FSMContext):
             await message.answer(DatabaseMessages.DELETE_NOT_FOUND)
     except ValueError:
         await message.answer(DatabaseMessages.DELETE_ERROR)
+        logger.error(f"Ошибка при удалении вопроса: {message.text}")
