@@ -48,6 +48,47 @@ async def create_handler(callback: CallbackQuery, state: FSMContext):
 
 @router.message(DatabaseStates.CREATE)
 async def create_message_handler(message: Message, state: FSMContext):
-    category, text = message.text.split("_", 1)
-    Database.Question.create(category= category, text= text)
-    await message.answer(DatabaseMessages.CREATE_SUCCESS)
+    try:
+        category, text = message.text.split("_", 1)
+        Database.Question.create(category= category, text= text)
+        await message.answer(DatabaseMessages.CREATE_SUCCESS)
+    except Exception as e:
+        await message.answer(DatabaseMessages.CREATE_ERROR)
+        logger.error(f"Ошибка при создании вопроса: {e}")
+
+""" UPDATE """
+@router.callback_query(DatabaseCallbackFactory.filter(F.action == DatabaseActions.UPDATE))
+async def update_handler(callback: CallbackQuery, state: FSMContext):
+    await callback.message.edit_text(DatabaseMessages.UPDATE)
+    await state.set_state(DatabaseStates.UPDATE)
+
+@router.message(DatabaseStates.UPDATE)
+async def update_message_handler(message: Message, state: FSMContext):
+    try:
+        question_id, new_category, new_text = message.text.split("_", 2)
+        question_id = int(question_id)
+        updated_question = Database.Question.update(question_id, category=new_category, text=new_text)
+        if updated_question:
+            await message.answer(DatabaseMessages.UPDATE_SUCCESS)
+        else:
+            await message.answer(DatabaseMessages.UPDATE_NOT_FOUND)
+    except ValueError:
+        await message.answer(DatabaseMessages.UPDATE_ERROR)
+
+""" DELETE """
+@router.callback_query(DatabaseCallbackFactory.filter(F.action == DatabaseActions.DELETE))
+async def delete_handler(callback: CallbackQuery, state: FSMContext):
+    await callback.message.edit_text(DatabaseMessages.DELETE)
+    await state.set_state(DatabaseStates.DELETE)
+
+@router.message(DatabaseStates.DELETE)
+async def delete_message_handler(message: Message, state: FSMContext):
+    try:
+        question_id = int(message.text)
+        deleted_question = Database.Question.delete(question_id)
+        if deleted_question:
+            await message.answer(DatabaseMessages.DELETE_SUCCESS)
+        else:
+            await message.answer(DatabaseMessages.DELETE_NOT_FOUND)
+    except ValueError:
+        await message.answer(DatabaseMessages.DELETE_ERROR)
