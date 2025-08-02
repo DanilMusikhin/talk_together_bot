@@ -4,9 +4,14 @@
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 # Фабрика для создания колбэков
-from app.callback_factories import DatabaseCallbackFactory, DatabaseActions
+from app.callback_factories import DatabaseCallbackFactory, DatabaseActions, StartCallbackFactory, StartActions
 
 def database_actions_keyboard() -> InlineKeyboardBuilder:
+    """Создаёт клавиатуру для действий с базой данных.
+
+    Returns:
+        InlineKeyboardBuilder: Клавиатура с кнопками для действий с базой данных.
+    """    
     kb = InlineKeyboardBuilder()
     kb.button(text= "Прочитать", callback_data= DatabaseCallbackFactory(action= DatabaseActions.READ))
     kb.button(text= "Добавить", callback_data= DatabaseCallbackFactory(action= DatabaseActions.CREATE))
@@ -43,3 +48,16 @@ def pagination_keyboard(action, current_page, total_records, records_per_page=5)
             ),
         )
     return keyboard
+
+def start_keyboard():
+    """Создаёт клавиатуру для стартового экрана.
+
+    Returns:
+        InlineKeyboardBuilder: Клавиатура с кнопками для стартового экрана.
+    """
+    kb = InlineKeyboardBuilder()
+    kb.button(
+        text="Вопрос",
+        callback_data=StartCallbackFactory(action=StartActions.QUESTION)
+    )
+    return kb
