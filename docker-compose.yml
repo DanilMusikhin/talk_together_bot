@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+  bot:
+    build: .
+    container_name: talk-together-bot
+    env_file:
+      - ./config/config.env
+    volumes:
+      - ./talk_together_bot.db:/talk_together_bot.db
+    restart: unless-stopped
+    
