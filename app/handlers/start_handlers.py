@@ -4,7 +4,7 @@
 from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery
 from aiogram.filters import Command
-from aiogram.utils.keyboard import InlineKeyboardBuilder
+from aiogram.fsm.context import FSMContext
 # Для случайного выбора вопроса
 import random
 # Лоигрование
@@ -30,9 +30,10 @@ logger = logging.getLogger(__name__)
     Хэндлеры
 """
 @router.message(Command("start"))
-async def start_handler(message: Message):
+async def start_handler(message: Message, state: FSMContext):
     """Хэндлер для команды /start
     """    
+    await state.clear()  
     await message.answer(StartMessages.START, reply_markup=start_keyboard().as_markup())
 
 @router.callback_query(StartCallbackFactory.filter(F.action == StartActions.QUESTION))
