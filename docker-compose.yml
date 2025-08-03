@@ -7,6 +7,6 @@ services:
     env_file:
       - ./config/config.env
     volumes:
-      - ./talk_together_bot.db:/talk_together_bot.db
+      - ./db:/app/db
     restart: unless-stopped
     
