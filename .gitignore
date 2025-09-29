@@ -1,6 +1,7 @@
 # Издержки работы программы
 __pycache__/
 venv/
+.vscode/
 
 # Свои файлы
 config.env
