@@ -33,6 +33,11 @@ logger = logging.getLogger(__name__)
 async def start_handler(message: Message, state: FSMContext):
     """Хэндлер для команды /start
     """    
+    # Проверяем пользователя в бд
+    user = Database.User.read(message.from_user.id)
+    if not user: 
+        Database.User.create(id= message.from_user.id, username= message.from_user.username)
+
     await state.clear()  
     await message.answer(StartMessages.START, reply_markup=start_keyboard().as_markup())
 

@@ -14,13 +14,19 @@ logger = logging.getLogger(__name__)
 """
     database_handlers.py
 """
+class DatabaseTable(Enum):
+    QUESTION = "question"
+    USER = "user"
+
 class DatabaseActions(Enum):
     READ = "read"
     CREATE = "create"
     UPDATE = "update"
     DELETE = "delete"
+    COUNT = "count"
 
 class DatabaseCallbackFactory(CallbackData, prefix='db'):
+    table: DatabaseTable
     action: DatabaseActions
     read_page: int = 0
 

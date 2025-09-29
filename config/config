@@ -7,4 +7,4 @@ BOT_TOKEN = your_bot_token_here
 ID_OWNER = 123456789
 
 # База
-DATABASE_URL = "sqlite:///test.db"
+DATABASE_URL = "sqlite:///db/talk_together_bot.db"

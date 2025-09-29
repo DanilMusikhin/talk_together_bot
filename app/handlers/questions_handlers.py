@@ -11,11 +11,11 @@ import logging
 # Для работы с базой данных
 from app.database import Database
 # Диалоги
-from app.messages import DatabaseMessages
+from app.messages import QuestionsMessages
 # Клавиатуры
 from app.keyboards import database_actions_keyboard, pagination_keyboard
 # Фабрика колбэков
-from app.callback_factories import DatabaseCallbackFactory, DatabaseActions
+from app.callback_factories import DatabaseCallbackFactory, DatabaseActions, DatabaseTable
 # Состояния
 from app.states import DatabaseStates
 # Фильтры
@@ -36,14 +36,14 @@ router = Router()
 @router.message(Command("questions"), IsAdminFilter())
 async def questions_handler(message: Message, state: FSMContext):
     await state.clear()
-    kb = database_actions_keyboard()
-    await message.answer(DatabaseMessages.START, reply_markup=kb.as_markup())
+    kb = database_actions_keyboard(DatabaseTable.QUESTION)
+    await message.answer(QuestionsMessages.START, reply_markup=kb.as_markup())
     logger.info(f"Пользователь {message.from_user.id} запросил действия с базой данных")
 
 """ CREATE"""
-@router.callback_query(DatabaseCallbackFactory.filter(F.action == DatabaseActions.CREATE))
+@router.callback_query(DatabaseCallbackFactory.filter(F.table == DatabaseTable.QUESTION and F.action == DatabaseActions.CREATE))
 async def create_handler(callback: CallbackQuery, state: FSMContext):
-    await callback.message.edit_text(DatabaseMessages.CREATE)
+    await callback.message.edit_text(QuestionsMessages.CREATE)
     await state.set_state(DatabaseStates.CREATE)
 
 @router.message(DatabaseStates.CREATE)
@@ -51,13 +51,13 @@ async def create_message_handler(message: Message, state: FSMContext):
     try:
         category, text = message.text.split("_", 1)
         Database.Question.create(category= category, text= text)
-        await message.answer(DatabaseMessages.CREATE_SUCCESS)
+        await message.answer(QuestionsMessages.CREATE_SUCCESS)
     except ValueError:
-        await message.answer(DatabaseMessages.CREATE_ERROR)
+        await message.answer(QuestionsMessages.CREATE_ERROR)
         logger.error(f"Ошибка при создании вопроса: {message.text}")
 
 """ READ """
-@router.callback_query(DatabaseCallbackFactory.filter(F.action == DatabaseActions.READ))
+@router.callback_query(DatabaseCallbackFactory.filter(F.table == DatabaseTable.QUESTION), DatabaseCallbackFactory.filter(F.action == DatabaseActions.READ))
 async def read_handler(callback: CallbackQuery, callback_data: DatabaseCallbackFactory):
     """Обработчик для чтения данных из базы по страницам.
 
@@ -75,7 +75,7 @@ async def read_handler(callback: CallbackQuery, callback_data: DatabaseCallbackF
         total_records = len(all_questions)
 
         if total_records == 0:
-            return await callback.message.edit_text(DatabaseMessages.READ_EMPTY)
+            return await callback.message.edit_text(QuestionsMessages.READ_EMPTY)
 
         # Вычисляем записи для текущей страницы
         start_index = page * records_per_page
@@ -89,6 +89,7 @@ async def read_handler(callback: CallbackQuery, callback_data: DatabaseCallbackF
 
         # Создаём клавиатуру для переключения страниц
         keyboard = pagination_keyboard(
+            table=DatabaseTable.QUESTION,
             action=DatabaseActions.READ, 
             current_page=page, 
             total_records=total_records, 
@@ -99,12 +100,12 @@ async def read_handler(callback: CallbackQuery, callback_data: DatabaseCallbackF
         await callback.message.edit_text(response, reply_markup=keyboard.as_markup())
     except Exception as e:
         logger.error(f"Ошибка при чтении данных: {e}")
-        await callback.message.edit_text(DatabaseMessages.READ_ERROR)
+        await callback.message.edit_text(QuestionsMessages.READ_ERROR)
 
 """ UPDATE """
-@router.callback_query(DatabaseCallbackFactory.filter(F.action == DatabaseActions.UPDATE))
+@router.callback_query(DatabaseCallbackFactory.filter(F.table == DatabaseTable.QUESTION and F.action == DatabaseActions.UPDATE))
 async def update_handler(callback: CallbackQuery, state: FSMContext):
-    await callback.message.edit_text(DatabaseMessages.UPDATE)
+    await callback.message.edit_text(QuestionsMessages.UPDATE)
     await state.set_state(DatabaseStates.UPDATE)
 
 @router.message(DatabaseStates.UPDATE)
@@ -114,17 +115,17 @@ async def update_message_handler(message: Message, state: FSMContext):
         question_id = int(question_id)
         updated_question = Database.Question.update(question_id, category=new_category, text=new_text)
         if updated_question:
-            await message.answer(DatabaseMessages.UPDATE_SUCCESS)
+            await message.answer(QuestionsMessages.UPDATE_SUCCESS)
         else:
-            await message.answer(DatabaseMessages.UPDATE_NOT_FOUND)
+            await message.answer(QuestionsMessages.UPDATE_NOT_FOUND)
     except ValueError:
-        await message.answer(DatabaseMessages.UPDATE_ERROR)
+        await message.answer(QuestionsMessages.UPDATE_ERROR)
         logger.error(f"Ошибка при обновлении вопроса: {message.text}")
 
 """ DELETE """
-@router.callback_query(DatabaseCallbackFactory.filter(F.action == DatabaseActions.DELETE))
+@router.callback_query(DatabaseCallbackFactory.filter(F.table == DatabaseTable.QUESTION and F.action == DatabaseActions.DELETE))
 async def delete_handler(callback: CallbackQuery, state: FSMContext):
-    await callback.message.edit_text(DatabaseMessages.DELETE)
+    await callback.message.edit_text(QuestionsMessages.DELETE)
     await state.set_state(DatabaseStates.DELETE)
 
 @router.message(DatabaseStates.DELETE)
@@ -133,9 +134,9 @@ async def delete_message_handler(message: Message, state: FSMContext):
         question_id = int(message.text)
         deleted_question = Database.Question.delete(question_id)
         if deleted_question:
-            await message.answer(DatabaseMessages.DELETE_SUCCESS)
+            await message.answer(QuestionsMessages.DELETE_SUCCESS)
         else:
-            await message.answer(DatabaseMessages.DELETE_NOT_FOUND)
+            await message.answer(QuestionsMessages.DELETE_NOT_FOUND)
     except ValueError:
-        await message.answer(DatabaseMessages.DELETE_ERROR)
+        await message.answer(QuestionsMessages.DELETE_ERROR)
         logger.error(f"Ошибка при удалении вопроса: {message.text}")

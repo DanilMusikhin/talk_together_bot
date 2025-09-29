@@ -83,6 +83,11 @@ class Database:
 
         category = Column(String, nullable=False)
         text = Column(String, nullable=False)
+    
+    class User(__Base):
+        __tablename__ = 'user'
+
+        username = Column(String, nullable=False)
 
 
 def init_db():
