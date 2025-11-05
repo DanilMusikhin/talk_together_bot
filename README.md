@@ -5,13 +5,20 @@
 ### 0. Открываем файл config, вставляем значения, переименовывем в config.env
 
 ## Развертывание с помощью Docker
-### 1. Собираем 
+### 1. Собираем и запускаем, или просто запускаем
 ```cmd
-docker build
+docker compose up -d --build
+docker compose up -d
 ```
-### 2. Запускаем в фоновом режиме
+### 2. Просмотр логов с момента запуска и в реальном времени
 ```cmd
-docker compose up -d 
+docker logs talk-together-bot
+docker compose logs -f talk-together-bot
+```
+### 3. Остановка или перезапуск
+```cmd
+docker compose down
+docker compose restart talk-together-bot
 ```
 
 ## Запуск через питон
