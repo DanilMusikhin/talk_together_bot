@@ -14,7 +14,7 @@ from typing import Any, Callable, Dict, Awaitable
 # Конфиг
 from config.config_reader import config
 # Обработчики
-from app.handlers import questions_handlers, start_handlers, users_handlers
+from app.handlers import questions_handlers, start_handlers, users_handlers, sql_handlers
 # БД
 from app.database import init_db
 # Мидварь
@@ -50,6 +50,7 @@ async def main():
         questions_handlers.router,
         users_handlers.router,
         start_handlers.router,
+        sql_handlers.router,
     )
 
     # Начало работы бота

@@ -8,3 +8,4 @@ class DatabaseStates(StatesGroup):
     CREATE = State()  # Состояние создания
     UPDATE = State()  # Состояние обновления
     DELETE = State()  # Состояние удаления
+    SQL = State() # Состояние для отправки SQL скрипта
