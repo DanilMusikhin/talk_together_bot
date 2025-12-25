@@ -10,14 +10,14 @@ def database_actions_keyboard(table: DatabaseTable) -> InlineKeyboardBuilder:
     """Создаёт клавиатуру для действий с базой данных.
 
     Args:
-        table: Тип таблицы (DatabaseTable.QUESTION или DatabaseTable.USER)
+        table: Тип таблицы (DatabaseTable.TASK или DatabaseTable.USER)
 
     Returns:
         InlineKeyboardBuilder: Клавиатура с кнопками для действий с базой данных.
     """    
     kb = InlineKeyboardBuilder()
 
-    if (table == DatabaseTable.QUESTION):
+    if (table == DatabaseTable.TASK):
         kb.button(text= "Прочитать", callback_data= DatabaseCallbackFactory(table= table, action= DatabaseActions.READ))
         kb.button(text= "Добавить", callback_data= DatabaseCallbackFactory(table= table, action= DatabaseActions.CREATE))
         kb.button(text= "Обновить", callback_data= DatabaseCallbackFactory(table= table, action= DatabaseActions.UPDATE))
@@ -68,7 +68,11 @@ def start_keyboard():
     """
     kb = InlineKeyboardBuilder()
     kb.button(
-        text="Вопрос",
-        callback_data=StartCallbackFactory(action=StartActions.QUESTION)
+        text="Задание",
+        callback_data=StartCallbackFactory(action=StartActions.TASK)
+    )
+    kb.button(
+        text="Шанс",
+        callback_data=StartCallbackFactory(action=StartActions.CHANCE)
     )
     return kb

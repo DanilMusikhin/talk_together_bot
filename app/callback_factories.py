@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
     database_handlers.py
 """
 class DatabaseTable(Enum):
-    QUESTION = "question"
+    TASK = "task"
     USER = "user"
 
 class DatabaseActions(Enum):
@@ -34,7 +34,8 @@ class DatabaseCallbackFactory(CallbackData, prefix='db'):
     start_handlers.py
 """
 class StartActions(Enum):
-    QUESTION = "question"
+    TASK = "task"
+    CHANCE = "chance"
 
 class StartCallbackFactory(CallbackData, prefix="start"):
     action: StartActions

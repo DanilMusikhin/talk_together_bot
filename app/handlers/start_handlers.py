@@ -41,23 +41,44 @@ async def start_handler(message: Message, state: FSMContext):
     await state.clear()  
     await message.answer(StartMessages.START, reply_markup=start_keyboard().as_markup())
 
-@router.callback_query(StartCallbackFactory.filter(F.action == StartActions.QUESTION))
+@router.callback_query(StartCallbackFactory.filter(F.action == StartActions.TASK))
 async def random_question_handler(callback: CallbackQuery):
     """Обработчик для кнопки "Вопрос"
     """    
-    # Получаем все вопросы из базы
-    all_questions = Database.Question.read_all()
-    if not all_questions:
-        return await callback.message.edit_text(StartMessages.NO_QUESTIONS)
+    # Получаем все задачи из базы
+    all_tasks = Database.Task.read_all()
+    if not all_tasks:
+        return await callback.message.edit_text(StartMessages.NO_TASKS)
 
-    # Выбираем случайный вопрос
-    random_question = random.choice(all_questions)
+    # Выбираем случайную задачу
+    random_task = random.choice(all_tasks)
 
-    # Обновляем сообщение с вопросом
+    # Обновляем сообщение с задачей
     await callback.message.edit_text(
-        StartMessages.QUESTION.value.format(
-            category= random_question.category, 
-            text= random_question.text
+        StartMessages.TASK.value.format(
+            category= random_task.category, 
+            text= random_task.text
+        ), 
+        reply_markup=start_keyboard().as_markup()
+    )
+
+@router.callback_query(StartCallbackFactory.filter(F.action == StartActions.CHANCE))
+async def random_chance_handler(callback: CallbackQuery):
+    """Обработчик для кнопки "Шанс"
+    """    
+    # Получаем все шансы из базы
+    all_chances = Database.Chances.read_all()
+    if not all_chances:
+        return await callback.message.edit_text(StartMessages.NO_CHANCES)
+
+    # Выбираем случайный шанс
+    random_chance = random.choice(all_chances)
+
+    # Обновляем сообщение с шансом
+    await callback.message.edit_text(
+        StartMessages.CHANCE.value.format(
+            category= random_chance.category, 
+            text= random_chance.text
         ), 
         reply_markup=start_keyboard().as_markup()
     )

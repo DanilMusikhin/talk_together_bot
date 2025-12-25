@@ -14,7 +14,7 @@ from typing import Any, Callable, Dict, Awaitable
 # Конфиг
 from config.config_reader import config
 # Обработчики
-from app.handlers import questions_handlers, start_handlers, users_handlers, sql_handlers
+from app.handlers import tasks_handlers, start_handlers, users_handlers, sql_handlers
 # БД
 from app.database import init_db
 # Мидварь
@@ -47,7 +47,7 @@ async def main():
     # Включение обработчиков и мидварей
     dp.callback_query.middleware(CallbackResponseMiddleware())
     dp.include_routers(
-        questions_handlers.router,
+        tasks_handlers.router,
         users_handlers.router,
         start_handlers.router,
         sql_handlers.router,

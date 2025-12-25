@@ -78,16 +78,22 @@ class Database:
             session.close()
             return obj
         
-    class Question(__Base):
-        __tablename__ = 'questions'
+    class Task(__Base):
+        __tablename__ = 'tasks'
 
         category = Column(String, nullable=False)
         text = Column(String, nullable=False)
     
     class User(__Base):
-        __tablename__ = 'user'
+        __tablename__ = 'users'
 
         username = Column(String, nullable=False)
+    
+    class Chances(__Base):
+        __tablename__ = 'chances'
+
+        category = Column(String, nullable=False)
+        text = Column(String, nullable=False)
 
 
 def init_db():
