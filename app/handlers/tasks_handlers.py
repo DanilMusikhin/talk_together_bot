@@ -49,9 +49,10 @@ async def create_handler(callback: CallbackQuery, state: FSMContext):
 @router.message(DatabaseStates.CREATE)
 async def create_message_handler(message: Message, state: FSMContext):
     try:
-        category, text = message.text.split("_", 1)
-        Database.Task.create(category= category, text= text)
-        await message.answer(TasksMessages.CREATE_SUCCESS)
+        for row in message.text.split("\n"):
+            category, text = row.split("_", 1)
+            Database.Task.create(category= category, text= text)
+            await message.answer(TasksMessages.CREATE_SUCCESS)
     except ValueError:
         await message.answer(TasksMessages.CREATE_ERROR)
         logger.error(f"Ошибка при создании задачи: {message.text}")
